@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: gittech-rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: admin
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - gittech-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  mysql-user:
+    image: mysql:8.0
+    container_name: gittech-mysql-user
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gittech_user
+    ports:
+      - '3306:3306'
+    volumes:
+      - mysql_user_data:/var/lib/mysql
+    networks:
+      - gittech-network
+
+  mysql-cart:
+    image: mysql:8.0
+    container_name: gittech-mysql-cart
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gittech_cart
+    ports:
+      - '3307:3306'
+    volumes:
+      - mysql_cart_data:/var/lib/mysql
+    networks:
+      - gittech-network
+
+  mysql-product:
+    image: mysql:8.0
+    container_name: gittech-mysql-product
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: gittech_product
+    ports:
+      - '3308:3306'
+    volumes:
+      - mysql_product_data:/var/lib/mysql
+    networks:
+      - gittech-network
+
+volumes:
+  rabbitmq_data:
+  mysql_user_data:
+  mysql_cart_data:
+  mysql_product_data:
+
+networks:
+  gittech-network:
+    driver: bridge
